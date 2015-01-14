@@ -1,20 +1,9 @@
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.util.HttpResponses;
-import hudson.util.IOUtils;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 
 /**
 * @author Kohsuke Kawaguchi

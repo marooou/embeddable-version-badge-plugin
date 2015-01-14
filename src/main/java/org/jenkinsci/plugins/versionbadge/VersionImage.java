@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
 import hudson.util.IOUtils;
 import jenkins.model.Jenkins;
@@ -27,8 +27,8 @@ import static javax.servlet.http.HttpServletResponse.*;
  *
  * @author Kohsuke Kawaguchi
  */
-class StatusImage implements HttpResponse {
-    private final byte[] payload;
+class VersionImage implements HttpResponse {
+    private byte[] payload;
 
     /**
      * To improve the caching, compute unique ETag.
@@ -38,9 +38,7 @@ class StatusImage implements HttpResponse {
      */
     private final String etag;
 
-    private final String length;
-
-    StatusImage(String fileName) throws IOException {
+    VersionImage(String fileName) throws IOException {
         etag = Jenkins.RESOURCE_PATH+'/'+fileName;
 
         URL image = new URL(
@@ -52,7 +50,18 @@ class StatusImage implements HttpResponse {
         } finally {
             IOUtils.closeQuietly(s);
         }
-        length = Integer.toString(payload.length);
+    }
+
+    private String getPayloadLength() {
+        return Integer.toString(payload.length);
+    }
+
+    protected final byte[] getPayload() {
+        return this.payload;
+    }
+
+    protected final void setPayload(byte[] payload) {
+        this.payload = payload;
     }
 
     public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
@@ -66,7 +75,7 @@ class StatusImage implements HttpResponse {
         rsp.setHeader("Expires","Fri, 01 Jan 1984 00:00:00 GMT");
         rsp.setHeader("Cache-Control", "no-cache, private");
         rsp.setHeader("Content-Type", "image/svg+xml;charset=utf-8");
-        rsp.setHeader("Content-Length", length);
-        rsp.getOutputStream().write(payload);
+        rsp.setHeader("Content-Length", this.getPayloadLength());
+        rsp.getOutputStream().write(this.getPayload());
     }
 }

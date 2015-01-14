@@ -1,7 +1,7 @@
 /*
 * The MIT License
 *
-* Copyright 2013 Kohsuke Kawaguchi, Dominik Bartholdi
+* Copyright 2013 Dominik Bartholdi.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,25 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
-import hudson.model.BallColor;
-import hudson.model.AbstractProject;
-import hudson.model.Run;
+import hudson.Plugin;
 
-import java.io.IOException;
+/**
+ * This plugin implementation only exists to force the loading of the permission in an early enough stage (see also JENKINS-4172). 
+ * If the permission is not loaded early enough, Jenkins fails to load
+ * permissions from config.
+ * 
+ * @author Dominik Bartholdi (imod)
+ */
+public class PluginImpl extends Plugin {
 
-public class ImageResolver {
-    
-    private final StatusImage activeImage;
-    private final StatusImage unknownImage;
-    
-    public ImageResolver() throws IOException {
-        activeImage = new StatusImage("version-active.svg");
-        unknownImage = new StatusImage("version-unknown.svg");
-    }
-
-    public StatusImage getImage(Run run) {
-        //AbstractProject project = (AbstractProject)run.getParent();
-        return getBallImage(run.getIconColor());
-    }
-
-    public StatusImage getImage(AbstractProject project) {
-        BallColor color = project.getIconColor();
-        return getBallImage(color);
-    }
-
-    public StatusImage getBallImage(BallColor color) {
-        if (!color.isAnimated() || color == BallColor.BLUE || color == BallColor.YELLOW) {
-            return activeImage;
-        }
-        return unknownImage;
+    @Override
+    public void start() throws Exception {
+        //
+        // As a work around, force loading of this permission so that by the time we start loading ACLs,
+        // we have this instance already registered, thereby avoiding a lookup.
+        PublicBadgeAction.VIEW_STATUS.toString();
     }
 
 }

@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
 import hudson.model.AbstractProject;
 import hudson.model.Action;

@@ -21,24 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
 import hudson.Extension;
+import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.UnprotectedRootAction;
-import hudson.model.AbstractProject;
 import hudson.security.ACL;
 import hudson.security.Permission;
 import hudson.security.PermissionScope;
 import hudson.util.HttpResponses;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-
 import jenkins.model.Jenkins;
-
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.kohsuke.stapler.HttpResponse;
@@ -46,17 +40,19 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
+import java.io.IOException;
+
 /**
- * Exposes the build status badge via unprotected URL.
+ * Exposes the version badge via unprotected URL.
  * 
- * The status of a job can be checked like this:
+ * The version of a job can be checked like this:
  * 
- * <li>http://localhost:8080/buildstatus/icon?job=[JOBNAME] <li>e.g. http://localhost:8080/buildstatus/icon?job=free1 <br/>
+ * <li>http://localhost:8080/versionBadge/icon?job=[JOBNAME] <li>e.g. http://localhost:8080/versionBadge/icon?job=free1 <br/>
  * <br/>
  *
- * The status of a particular build can be checked like this:
+ * The version of a particular build can be checked like this:
  *
- * <li>http://localhost:8080/buildstatus/icon?job=[JOBNAME]&build=[BUILDNUMBER] <li>e.g. http://localhost:8080/buildstatus/icon?job=free1&build=5<br/>
+ * <li>http://localhost:8080/versionBadge/icon?job=[JOBNAME]&build=[BUILDNUMBER] <li>e.g. http://localhost:8080/versionBadge/icon?job=free1&build=5<br/>
  * <br/>
  *
  * Even though the URL is unprotected, the user does still need the 'ViewStatus' permission on the given Job. If you want the status icons to be public readable/accessible, just grant the 'ViewStatus'
@@ -96,7 +92,7 @@ public class PublicBadgeAction implements UnprotectedRootAction {
             return iconResolver.getImage(run);
         } else {
             AbstractProject<?, ?> project = getProject(job);
-            return iconResolver.getImage(project);
+            return iconResolver.getImage(project.getLastBuild());
         }
     }
 

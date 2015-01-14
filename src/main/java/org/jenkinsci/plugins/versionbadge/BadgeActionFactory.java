@@ -1,9 +1,8 @@
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.model.BallColor;
 import hudson.model.TransientProjectActionFactory;
 
 import java.io.IOException;
@@ -27,8 +26,8 @@ public class BadgeActionFactory extends TransientProjectActionFactory {
         return Collections.singleton(new BadgeAction(this,target));
     }
 
-    public StatusImage getImage(AbstractProject project) {
-        return iconResolver.getImage(project);
+    public VersionImage getImage(AbstractProject project) {
+        return iconResolver.getImage(project.getLastBuild());
     }
 
 }

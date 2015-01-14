@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
 import hudson.Extension;
 import hudson.model.*;
@@ -21,7 +21,7 @@ public class RunBadgeActionFactory extends TransientBuildActionFactory {
         return Collections.singleton(new RunBadgeAction(this, target));
     }
 
-    public StatusImage getImage(Run run) {
+    public VersionImage getImage(Run run) {
         return iconResolver.getImage(run);
     }
 }

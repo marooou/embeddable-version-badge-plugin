@@ -1,7 +1,7 @@
 /*
 * The MIT License
 *
-* Copyright 2013 Dominik Bartholdi.
+* Copyright 2013 Kohsuke Kawaguchi, Dominik Bartholdi
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,36 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
-package org.jenkinsci.plugins.badge;
+package org.jenkinsci.plugins.versionbadge;
 
-import hudson.Plugin;
+import hudson.model.BallColor;
+import hudson.model.Run;
 
-/**
- * This plugin implementation only exists to force the loading of the permission in an early enough stage (see also JENKINS-4172). 
- * If the permission is not loaded early enough, Jenkins fails to load
- * permissions from config.
- * 
- * @author Dominik Bartholdi (imod)
- */
-public class PluginImpl extends Plugin {
+import java.io.IOException;
 
-    @Override
-    public void start() throws Exception {
-        //
-        // As a work around, force loading of this permission so that by the time we start loading ACLs,
-        // we have this instance already registered, thereby avoiding a lookup.
-        PublicBadgeAction.VIEW_STATUS.toString();
+public class ImageResolver {
+
+    private final UpdatableVersionImage activeImage;
+    private final VersionImage unknownImage;
+    
+    public ImageResolver() throws IOException {
+        activeImage = new UpdatableVersionImage("version-active.svg");
+        unknownImage = new VersionImage("version-unknown.svg");
+    }
+
+    public VersionImage getImage(Run run) {
+        BallColor color = run.getIconColor();
+        if (!color.isAnimated() || color == BallColor.BLUE || color == BallColor.YELLOW) {
+            try {
+                BuildVersion buildVersion = new BuildVersion(run);
+                buildVersion.load();
+                activeImage.updateVersion(buildVersion);
+                return activeImage;
+            } catch (IOException ex) {
+                return unknownImage;
+            }
+        }
+        return unknownImage;
     }
 
 }
